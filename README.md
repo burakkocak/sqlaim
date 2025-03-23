@@ -10,4 +10,6 @@ create a approval screen
 approve sql query
 run sql query
 
+ai sql query check and recomendation added
+
 
