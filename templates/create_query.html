@@ -1,0 +1,27 @@
+<!-- templates/submit_query.html -->
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">SQL Sorgusu Gir</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Açıklama</label>
+                        <input type="text" class="form-control" id="description" name="description" placeholder="Bu sorgu ne yapacak?">
+                    </div>
+                    <div class="mb-3">
+                        <label for="query_text" class="form-label">Sorgu</label>
+                        <textarea class="form-control" id="query_text" name="query_text" rows="10" required></textarea>
+                    </div>
+                    <div class="alert alert-warning">
+                        <strong>Note:</strong> Sorgunuz doğrulanacak ve onay sonrası çalışacaktır.
+                    </div>
+                    <button type="submit" class="btn btn-primary">Gönder</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+<!-- templates/review_query.html -->
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">Review Query #{{ query.id }}</div>
+            <div class="card-body">
+                <h5>Submitted by: {{ query.submitter.username }}</h5>
+                
+                <h5>Description:</h5>
+                <p>{{ query.description or 'No description' }}</p>
+                
+                <h5>SQL Query:</h5>
+                <div class="code-area mb-3">{{ query.sql_text }}</div>
+                
+                <h5>Validation Result:</h5>
+                <div class="alert {% if 'valid' in query.validation_result %}alert-success{% else %}alert-warning{% endif %}">
+                    {{ query.validation_result }}
+                </div>
+                
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button type="submit" name="action" value="approve" class="btn btn-success w-100">Approve Query</button>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-danger w-100" data-bs-toggle="collapse" data-bs-target="#rejectForm">
+                                Reject Query
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="collapse mt-3" id="rejectForm">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Rejection Reason:</h5>
+                                <textarea class="form-control mb-3" name="rejection_reason" rows="3"></textarea>
+                                <button type="submit" name="action" value="reject" class="btn btn-danger">Confirm Rejection</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

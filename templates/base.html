@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Secure Flask App{% endblock %}</title>
+    <title>{% block title %}MiQa App{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -45,7 +45,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">Secure App</a>
+            <a class="navbar-brand" href="{{ url_for('index') }}">MiQa App</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -57,15 +57,23 @@
                     </li>
                     {% if session.get('user_role') == 'admin' %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('user_management') }}">User Management</a>
+                        <a class="nav-link" href="{{ url_for('user_management') }}">Kullanıcı Yönetimi</a>
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                        <a class="nav-link" href="{{ url_for('user_dashboard') }}">Sorgularım</a>
+                    </li>
+                    <!-- templates/base.html (updated navigation) -->
+<!-- Add this inside the navigation bar after the User Management nav item -->
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('create_query') }}">Sorgu Gir</a>
+</li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Çıkış Yap</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        <a class="nav-link" href="{{ url_for('login') }}">Giriş Yap</a>
                     </li>
                     {% endif %}
                 </ul>

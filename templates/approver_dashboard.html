@@ -1,0 +1,36 @@
+<!-- templates/approver_dashboard.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>Pending Queries for Approval</h2>
+
+{% if queries %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Submitter</th>
+                    <th>Description</th>
+                    <th>Validation</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for query in queries %}
+                    <tr>
+                        <td>{{ query.id }}</td>
+                        <td>{{ query.submitter.username }}</td>
+                        <td>{{ query.description or 'No description' }}</td>
+                        <td>{{ query.validation_result }}</td>
+                        <td>
+                            <a href="{{ url_for('review_query', query_id=query.id) }}" class="btn btn-sm btn-primary">Review</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="alert alert-info">No pending queries to approve.</div>
+{% endif %}
+{% endblock %}

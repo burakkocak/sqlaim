@@ -1,0 +1,86 @@
+       <!-- templates/user_dashboard.html -->
+       {% extends "base.html" %}
+       {% block content %}
+       <h2>Sorgularım</h2>
+       <div class="mb-3">
+           <a href="{{ url_for('create_query') }}" class="btn btn-primary">Yeni sorgu gir</a>
+       </div>
+       
+       {% if queries %}
+           <div class="table-responsive">
+               <table class="table table-striped">
+                   <thead>
+                       <tr>
+                           <th>ID</th>
+                           <th>Description</th>
+                           <th>Status</th>
+                           <th>Validation</th>
+                           <th>Actions</th>
+                       </tr>
+                   </thead>
+                   <tbody>
+                       {% for query in queries %}
+                           <tr>
+                               <td>{{ query.id }}</td>
+                               <td>{{ query.description or 'No description' }}</td>
+                               <td>
+                                   {% if query.status == 'pending' %}
+                                       <span class="badge bg-warning">Pending</span>
+                                   {% elif query.status == 'approved' %}
+                                       <span class="badge bg-success">Approved</span>
+                                   {% else %}
+                                       <span class="badge bg-danger">Rejected</span>
+                                   {% endif %}
+                               </td>
+                               <td>{{ query.validation_result }}</td>
+                               <td>
+                                   <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#viewQueryModal{{ query.id }}">
+                                       View Query
+                                   </button>
+                               </td>
+                           </tr>
+                       {% endfor %}
+                   </tbody>
+               </table>
+           </div>
+           
+           {% for query in queries %}
+               <div class="modal fade" id="viewQueryModal{{ query.id }}" tabindex="-1">
+                   <div class="modal-dialog modal-lg">
+                       <div class="modal-content">
+                           <div class="modal-header">
+                               <h5 class="modal-title">Query #{{ query.id }}</h5>
+                               <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                           </div>
+                           <div class="modal-body">
+                               <h6>Description:</h6>
+                               <p>{{ query.description or 'No description' }}</p>
+                               
+                               <h6>SQL Query:</h6>
+                               <div class="code-area">{{ query.sql_text }}</div>
+                               
+                               <h6>Status: 
+                                   {% if query.status == 'pending' %}
+                                       <span class="badge bg-warning">Pending</span>
+                                   {% elif query.status == 'approved' %}
+                                       <span class="badge bg-success">Approved</span>
+                                   {% else %}
+                                       <span class="badge bg-danger">Rejected</span>
+                                   {% endif %}
+                               </h6>
+                               
+                               <h6>Validation Result:</h6>
+                               <p>{{ query.validation_result }}</p>
+                           </div>
+                           <div class="modal-footer">
+                               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           {% endfor %}
+       {% else %}
+           <div class="alert alert-info">You haven't submitted any queries yet.</div>
+       {% endif %}
+       {% endblock %}
+               

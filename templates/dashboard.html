@@ -8,14 +8,17 @@
     </div>
     <div class="card-body">
         <p>Last login: {{ user.last_login.strftime('%Y-%m-%d %H:%M:%S') if user.last_login else 'First login' }}</p>
-        <p>This is your secure dashboard. Only authenticated users can see this page.</p>
-        
+        <p>Hoşgeldiniz</p>
+
+
+ 
         {% if session.get('user_role') == 'admin' %}
         <div class="alert alert-info">
-            <i class="fas fa-info-circle me-2"></i> As an administrator, you have access to the 
-            <a href="{{ url_for('user_management') }}" class="alert-link">User Management</a> section.
+            <i class="fas fa-info-circle me-2"></i> Admin olduğun için bu sayfaya erişimin var. 
+            <a href="{{ url_for('user_management') }}" class="alert-link">Kullanıcı Yönetimi</a> section.
         </div>
         {% endif %}
     </div>
 </div>
 {% endblock %}
+
