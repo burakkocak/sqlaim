@@ -391,6 +391,25 @@ def unlock_user(user_id):
     
     return redirect(url_for('user_management'))
 
+@app.route('/queries')
+@app.route('/queries/<status>')
+@login_required
+@approver_required
+def query_list(status=None):
+    """
+    Display a list of queries for approvers.
+    Optionally filter by status (pending, approved, rejected).
+    """
+    # Build the query based on status filter
+    query = SqlQuery.query
+    
+    if status:
+        query = query.filter_by(status=status)
+    
+    # Get all queries with the specified status (or all if no status specified)
+    queries = query.order_by(SqlQuery.created_at.desc()).all()
+    
+    return render_template('query_list.html', queries=queries, status=status)
 
 
 @app.route('/queries/create', methods=['GET', 'POST'])
@@ -465,7 +484,7 @@ def view_query(query_id):
         if approver:
             approver_name = approver.username
     
-    return render_template('view_query.html', query=query, approver_name=approver_name)
+    return render_template('review_query.html', query=query, approver_name=approver_name)
 
 @app.route('/queries/approve/<query_id>', methods=['GET', 'POST'])
 @login_required
@@ -510,7 +529,7 @@ def approve_query(query_id):
         
         return redirect(url_for('query_list', status='pending'))
     
-    return render_template('approve_query.html', query=query)
+    return render_template('review_query.html', query=query)
 
 @app.route('/queries/execute/<query_id>', methods=['POST'])
 @login_required

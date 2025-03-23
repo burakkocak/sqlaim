@@ -1,10 +1,10 @@
 <!-- templates/500.html -->
 {% extends "base.html" %}
-{% block title %}Server Error{% endblock %}
+{% block title %}Sunucu Hatası{% endblock %}
 {% block content %}
 <div class="text-center">
-    <h1>500 - Server Error</h1>
-    <p>Something went wrong. Please try again later.</p>
-    <a href="{{ url_for('index') }}" class="btn btn-primary">Go Home</a>
+    <h1>500 - Sunucu Hatası</h1>
+    <p>Bir şeyler ters gitti, biraz bekledikten sonra tekrar deneyin.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">Ana Sayfaya Dön</a>
 </div>
 {% endblock %}

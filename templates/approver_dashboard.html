@@ -1,7 +1,7 @@
 <!-- templates/approver_dashboard.html -->
 {% extends "base.html" %}
 {% block content %}
-<h2>Pending Queries for Approval</h2>
+<h2>Onay Bekleyen Kayıtlar</h2>
 
 {% if queries %}
     <div class="table-responsive">
@@ -23,7 +23,7 @@
                         <td>{{ query.description or 'No description' }}</td>
                         <td>{{ query.validation_result }}</td>
                         <td>
-                            <a href="{{ url_for('review_query', query_id=query.id) }}" class="btn btn-sm btn-primary">Review</a>
+                            <a href="{{ url_for('view_query', query_id=query.id) }}" class="btn btn-sm btn-primary">Review</a>
                         </td>
                     </tr>
                 {% endfor %}
