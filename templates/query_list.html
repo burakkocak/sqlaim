@@ -35,7 +35,7 @@
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-                <li class="breadcrumb-item active">Pending Approvals</li>
+                <li class="breadcrumb-item active">Onay Bekleyenler</li>
             </ol>
         </nav>
 
@@ -52,7 +52,7 @@
 
         <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">SQL Queries Pending Approval</h5>
+                <h5 class="mb-0">Onay Bekleyen Sorgular</h5>
                 <div>
                     <div class="btn-group" role="group">
                         <a href="{{ url_for('query_list', status='pending') }}" class="btn btn-sm {% if status == 'pending' %}btn-primary{% else %}btn-outline-primary{% endif %}">Pending</a>
@@ -73,6 +73,8 @@
                                     <th>Submitted By</th>
                                     <th>Date</th>
                                     <th>Status</th>
+                                    <th>YZ Yorumu</th>
+                                    <th>YZ Durumu</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -86,6 +88,12 @@
                                     <td>
                                         <span class="badge {% if query.status == 'pending' %}badge-pending{% elif query.status == 'approved' %}badge-approved{% else %}badge-rejected{% endif %} py-2 px-3">
                                             {{ query.status|upper }}
+                                        </span>
+                                    </td>
+                                    <td class="query-description">{{ query.llm_analysis }}</td>
+                                    <td>
+                                        <span class="badge {% if query.status == 'pending' %}badge-pending{% elif query.status == 'approved' %}badge-approved{% else %}badge-rejected{% endif %} py-2 px-3">
+                                            {{ query.approval_recommendation|upper }}
                                         </span>
                                     </td>
                                     <td>
@@ -107,7 +115,7 @@
                     </div>
                 {% else %}
                     <div class="alert alert-info">
-                        No queries found for the selected status.
+                        Bu statude sorgu bulunamadı.
                     </div>
                 {% endif %}
             </div>

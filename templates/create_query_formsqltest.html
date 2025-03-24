@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Include CodeMirror CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+
+<!-- Include CodeMirror JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">SQL Sorgusu Gir</div>
+            <div class="card-body">
+                <form method="POST" onsubmit="syncCodeMirror();">
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Açıklama</label>
+                        <input type="text" class="form-control" id="description" name="description" placeholder="Bu sorgu ne yapacak?">
+                    </div>
+                    <div class="mb-3">
+                        <label for="query_text" class="form-label">Sorgu</label>
+                        <textarea class="form-control" id="query_text" name="query_text" rows="10" required></textarea>
+                    </div>
+                    <div class="alert alert-warning">
+                        <strong>Note:</strong> Sorgunuz doğrulanacak ve onay sonrası çalışacaktır.
+                    </div>
+                    <button type="submit" class="btn btn-primary">Gönder</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize CodeMirror
+    var editor = CodeMirror.fromTextArea(document.getElementById("query_text"), {
+        mode: "text/x-sql",
+        theme: "dracula",
+        lineNumbers: true,
+        matchBrackets: true,
+        autoCloseBrackets: true
+    });
+
+    // Function to sync CodeMirror content to the textarea before form submission
+    function syncCodeMirror() {
+        document.getElementById("query_text").value = editor.getValue();
+    }
+</script>
+
+{% endblock %}

@@ -65,12 +65,10 @@
                     </li>
                     {% if session.get('user_role') in ['admin','approver'] %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('approve_query',query_id=queryid) }}">Onay</a>
+                        <a class="nav-link" href="{{ url_for('query_list') }}">Onay Listesi</a>
                     </li>
                     {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('query_list') }}">Liste</a>
-                    </li>
+                 
 
                     <!-- templates/base.html (updated navigation) -->
 <!-- Add this inside the navigation bar after the User Management nav item -->
