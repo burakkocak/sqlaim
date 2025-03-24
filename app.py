@@ -9,6 +9,7 @@ import re
 import uuid
 import sqlparse
 from sqlalchemy import text
+import requests
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -57,6 +58,8 @@ class SqlQuery(db.Model):
     is_executed = db.Column(db.Boolean, default=False)
     execution_date = db.Column(db.DateTime, nullable=True)
     execution_result = db.Column(db.Text, nullable=True)
+    llm_analysis= db.Column(db.Text,nullable=True)
+    approval_recommendation = db.Column(db.String(20), default='pending')  # 'recommended', 'not_recommended', or 'pending'
     
     # Relationships
     user = db.relationship('User', foreign_keys=[user_id], backref='queries')
@@ -391,6 +394,7 @@ def unlock_user(user_id):
     
     return redirect(url_for('user_management'))
 
+#Sorgular
 @app.route('/queries')
 @app.route('/queries/<status>')
 @login_required
@@ -411,7 +415,118 @@ def query_list(status=None):
     
     return render_template('query_list.html', queries=queries, status=status)
 
-
+@app.route('/queries/create', methods=['GET', 'POST'])
+@login_required
+def create_query():
+    if request.method == 'POST':
+        query_text = request.form.get('query_text')
+        description = request.form.get('description')
+        
+        # Validate inputs
+        if not query_text or not description:
+            flash('Query text and description are required', 'danger')
+            return render_template('create_query.html', query_text=query_text, description=description)
+        
+        # Basic SQL validation (as in your original code)
+        try:
+            parsed = sqlparse.parse(query_text)
+            if not parsed:
+                flash('Invalid SQL query format', 'danger')
+                return render_template('create_query.html', query_text=query_text, description=description)
+            
+            query_upper = query_text.upper()
+            dangerous_keywords = ['DROP', 'TRUNCATE', 'DELETE', 'ALTER', 'GRANT', 'REVOKE', 'INSERT', 'UPDATE']
+            for keyword in dangerous_keywords:
+                if keyword in query_upper and not 'SELECT' in query_upper:
+                    flash(f'Potential harmful operation detected: {keyword}. This will require special approval.', 'warning')
+                    break
+        except Exception as e:
+            flash(f'Error validating query: {str(e)}', 'danger')
+            return render_template('create_query.html', query_text=query_text, description=description)
+        
+        # Send to Ollama for analysis
+        try:
+            import requests
+            
+            prompt = f"""
+            Review the following SQL query based on the given rules
+            
+            ```sql
+            {query_text}
+            ```
+            
+            Context: 
+1.All SELECT statements must include NOLOCK after every table name. If missing, highlight the issue.
+2.UPDATE and DELETE statements must not be executed without a WHERE clause. If a WHERE clause is present, it must contain a meaningful condition and should not rely solely on equality (=) filtering. Flag any violations.
+3.Subqueries must also include NOLOCK for all tables used. Identify missing NOLOCK usages.
+4.For UPDATE, INSERT, and DELETE operations, if the transaction is interrupted or killed, it must ensure a session rollback and notify the user. Check if this safeguard is implemented.
+5.SELECT INTO statements must not be used, as they can create full table backups or copies. If found, flag it.
+6.All SELECT queries must limit the number of rows fetched, even if a WHERE clause is used. A maximum limit, such as TOP 10000, must be enforced. If missing, indicate the issue.
+7.If the query involves a table from a predefined list of critical tables, warn the user. The critical table list: [CUSTOMERS, ACCOUNT, NOTIFICATION].
+            
+            Respond with either "APPROVE" or "REJECT" followed by a brief explanation.
+            """
+            
+            # Call Ollama API
+            response = requests.post(
+                'http://localhost:11434/api/generate',
+                json={
+                    "model": "llama3", # or whatever model you prefer
+                    "prompt": prompt,
+                    "stream": False
+                }
+            )
+            
+            llm_response = ""
+            approval_recommendation = "pending"
+            
+            if response.status_code == 200:
+                llm_response = response.json().get('response', '')
+                
+                # Simple parsing of the LLM response
+                if "APPROVE" in llm_response.upper():
+                    approval_recommendation = "recommended"
+                elif "REJECT" in llm_response.upper():
+                    approval_recommendation = "not_recommended"
+                
+                # Store LLM analysis for admin review
+                llm_analysis = f"LLM Analysis:\n{llm_response}"
+            else:
+                llm_analysis = f"LLM analysis failed: {response.text}"
+        
+        except Exception as e:
+            llm_analysis = f"Error analyzing with LLM: {str(e)}"
+            approval_recommendation = "pending"
+        
+        # Create new query with LLM analysis
+        new_query = SqlQuery(
+            query_text=query_text,
+            description=description,
+            user_id=session['user_id'],
+            status='pending',
+            llm_analysis=llm_analysis,
+            approval_recommendation=approval_recommendation
+        )
+        
+        try:
+            db.session.add(new_query)
+            db.session.commit()
+            
+            if approval_recommendation == "recommended":
+                flash('SQL query submitted successfully. LLM recommends approval.', 'success')
+            elif approval_recommendation == "not_recommended":
+                flash('SQL query submitted. LLM has some concerns. An admin will review.', 'warning')
+            else:
+                flash('SQL query submitted successfully for approval', 'success')
+                
+            return redirect(url_for('user_dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error submitting query: {str(e)}', 'danger')
+            return render_template('create_query.html', query_text=query_text, description=description)
+    
+    return render_template('create_query.html')
+""" #orijinal olan
 @app.route('/queries/create', methods=['GET', 'POST'])
 @login_required
 def create_query():
@@ -465,6 +580,7 @@ def create_query():
             return render_template('create_query.html', query_text=query_text, description=description)
     
     return render_template('create_query.html')
+#burada bitti """
 
 @app.route('/queries/view/<query_id>')
 @login_required
